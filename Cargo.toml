@@ -1,5 +1,5 @@
 [package]
-name = "Mooks_Macro"
+name = "mooks_macro"
 version = "1.0.3"
 edition = "2021"
 build = "build.rs"

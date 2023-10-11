@@ -187,11 +187,11 @@ fn click2img(enigo: &mut Enigo, stop_sign: &mut bool){
                     debug_println!("Found Image Center ({}, {})", click_x, click_y);
                     enigo.mouse_move_to(click_x, click_y);
                     enigo.mouse_click(enigo::MouseButton::Left);
-                    if milli_wait_stop(500){
-                        *stop_sign = true;
-                        return;
-                    }
                 }
+            }
+            if milli_wait_stop(500){
+                *stop_sign = true;
+                return;
             }
         }
     }

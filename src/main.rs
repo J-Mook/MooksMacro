@@ -62,7 +62,6 @@ fn main() {
 
 fn mooks_macro() {
     
-    println!("");
     println!("학습 창을 클릭하고 F2를 누르세요...");
     println!("");
     loop{
@@ -103,7 +102,8 @@ fn mooks_macro() {
             rect.top = 66;
         }
     }
-        
+    
+    println!("정지하려면 F4를 누르세요...");
     let mut enigo: Enigo = Enigo::new();
     loop {
         let mut stop_sign = false;
@@ -112,12 +112,8 @@ fn mooks_macro() {
         
         click2img(&mut enigo, &mut stop_sign);
         
-        debug_println!("정지하려면 10초안에 F4를 누르세요...");
         if stop_sign || milli_wait_stop(10000){
             break;
-        }
-        else {
-            debug_println!("늦었습니다.");
         }
     }
 }

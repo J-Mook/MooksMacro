@@ -190,35 +190,3 @@ fn find_image(screenshot: &image::DynamicImage, img: &image::DynamicImage) -> Op
     }
     None
 }
-
-
-// extern crate winapi;
-
-// use winapi::um::winuser::{SetWindowsHookExW, CallNextHookEx, GetMessageW, UnhookWindowsHookEx, WH_MOUSE_LL};
-// use winapi::um::winuser::{WM_LBUTTONDOWN, MSLLHOOKSTRUCT};
-// use winapi::shared::minwindef::LPARAM;
-
-// unsafe extern "system" fn hook_proc(n_code: i32, w_param: usize, l_param: LPARAM) -> isize {
-//     if w_param as u32 == WM_LBUTTONDOWN {
-//         let mouse_struct = *(l_param as *mut MSLLHOOKSTRUCT);
-//         println!("Clicked at: ({}, {})", mouse_struct.pt.x, mouse_struct.pt.y);
-//     }
-
-//     CallNextHookEx(std::ptr::null_mut(), n_code, w_param, l_param)
-// }
-
-// fn main() {
-//     unsafe {
-//         let hook = SetWindowsHookExW(WH_MOUSE_LL, Some(hook_proc as _), std::ptr::null_mut(), 0);
-//         if hook.is_null() {
-//             println!("Failed to set hook");
-//             return;
-//         }
-
-//         let mut msg = std::mem::zeroed();
-//         while GetMessageW(&mut msg, std::ptr::null_mut(), 0, 0) > 0 {}
-
-//         UnhookWindowsHookEx(hook);
-//     }
-// }
-

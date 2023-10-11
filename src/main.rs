@@ -113,6 +113,7 @@ fn mooks_macro() {
         click2img(&mut enigo, &mut stop_sign);
         
         if stop_sign || milli_wait_stop(10000){
+            println!("매크로가 멈췄습니다.");
             break;
         }
     }

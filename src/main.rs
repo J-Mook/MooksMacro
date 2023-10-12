@@ -30,35 +30,35 @@ fn get_debug_mode() -> bool {
         DEBUGMODE
     }
 }
-fn main() {
+// fn main() {
 
-    println!(r"
-    __       __                      __        __                                                                    
-    /  \     /  |                    /  |      /  |                                                                   
-    $$  \   /$$ |  ______    ______  $$ |   __ $$/_______        _____  ____    ______    _______   ______    ______  
-    $$$  \ /$$$ | /      \  /      \ $$ |  /  |$//       |      /     \/    \  /      \  /       | /      \  /      \ 
-    $$$$  /$$$$ |/$$$$$$  |/$$$$$$  |$$ |_/$$/  /$$$$$$$/       $$$$$$ $$$$  | $$$$$$  |/$$$$$$$/ /$$$$$$  |/$$$$$$  |
-    $$ $$ $$/$$ |$$ |  $$ |$$ |  $$ |$$   $$<   $$      \       $$ | $$ | $$ | /    $$ |$$ |      $$ |  $$/ $$ |  $$ |
-    $$ |$$$/ $$ |$$ \__$$ |$$ \__$$ |$$$$$$  \   $$$$$$  |      $$ | $$ | $$ |/$$$$$$$ |$$ \_____ $$ |      $$ \__$$ |
-    $$ | $/  $$ |$$    $$/ $$    $$/ $$ | $$  | /     $$/       $$ | $$ | $$ |$$    $$ |$$       |$$ |      $$    $$/ 
-    $$/      $$/  $$$$$$/   $$$$$$/  $$/   $$/  $$$$$$$/        $$/  $$/  $$/  $$$$$$$/  $$$$$$$/ $$/        $$$$$$/  
-    ");
-    println!("
-                                          ##    ###                        ######                       ##       ##
-                                         ##      ##                         ##  ##                      ##        ##
-                                        ##       ##      ##  ##             ##  ##  ##  ##    #####    #####       ##
-                                        ##       #####   ##  ##             #####   ##  ##   ##         ##         ##
-                                        ##       ##  ##  ##  ##             ## ##   ##  ##    #####     ##         ##
-                                         ##      ##  ##   #####             ##  ##  ##  ##        ##    ## ##     ##
-                                          ##    ######       ##            #### ##   ######  ######      ###     ##
-                                                         #####
-    ");
-    println!("\n======================================================================================================================\n");
+//     println!(r"
+//     __       __                      __        __                                                                    
+//     /  \     /  |                    /  |      /  |                                                                   
+//     $$  \   /$$ |  ______    ______  $$ |   __ $$/_______        _____  ____    ______    _______   ______    ______  
+//     $$$  \ /$$$ | /      \  /      \ $$ |  /  |$//       |      /     \/    \  /      \  /       | /      \  /      \ 
+//     $$$$  /$$$$ |/$$$$$$  |/$$$$$$  |$$ |_/$$/  /$$$$$$$/       $$$$$$ $$$$  | $$$$$$  |/$$$$$$$/ /$$$$$$  |/$$$$$$  |
+//     $$ $$ $$/$$ |$$ |  $$ |$$ |  $$ |$$   $$<   $$      \       $$ | $$ | $$ | /    $$ |$$ |      $$ |  $$/ $$ |  $$ |
+//     $$ |$$$/ $$ |$$ \__$$ |$$ \__$$ |$$$$$$  \   $$$$$$  |      $$ | $$ | $$ |/$$$$$$$ |$$ \_____ $$ |      $$ \__$$ |
+//     $$ | $/  $$ |$$    $$/ $$    $$/ $$ | $$  | /     $$/       $$ | $$ | $$ |$$    $$ |$$       |$$ |      $$    $$/ 
+//     $$/      $$/  $$$$$$/   $$$$$$/  $$/   $$/  $$$$$$$/        $$/  $$/  $$/  $$$$$$$/  $$$$$$$/ $$/        $$$$$$/  
+//     ");
+//     println!("
+//                                           ##    ###                        ######                       ##       ##
+//                                          ##      ##                         ##  ##                      ##        ##
+//                                         ##       ##      ##  ##             ##  ##  ##  ##    #####    #####       ##
+//                                         ##       #####   ##  ##             #####   ##  ##   ##         ##         ##
+//                                         ##       ##  ##  ##  ##             ## ##   ##  ##    #####     ##         ##
+//                                          ##      ##  ##   #####             ##  ##  ##  ##        ##    ## ##     ##
+//                                           ##    ######       ##            #### ##   ######  ######      ###     ##
+//                                                          #####
+//     ");
+//     println!("\n======================================================================================================================\n");
     
-    loop{
-        mooks_macro();
-    }
-}
+//     loop{
+//         mooks_macro();
+//     }
+// }
 
 fn mooks_macro() {
     
@@ -226,4 +226,108 @@ fn find_image(screenshot: &image::DynamicImage, img: &image::DynamicImage) -> Op
         }
     }
     None
+}
+
+
+
+use eframe::egui;
+
+fn main() -> Result<(), eframe::Error> {
+    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+    let options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Keyboard events",
+        options,
+        Box::new(|_cc| Box::<Content>::default()),
+    )
+}
+
+struct Content {
+    text: String,
+    enigo: Enigo,
+    stop_sign: bool,
+    rect: RECT,
+}
+
+impl Default for Content {
+    fn default() -> Self {
+        Content {
+            text: String::default(),
+            enigo: Enigo::new(),
+            stop_sign: true,
+            rect: RECT {
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+            },
+        }
+    }
+}
+
+impl eframe::App for Content {
+
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // let mut rect = RECT {
+        //     left: 0,
+        //     top: 0,
+        //     right: 0,
+        //     bottom: 0,
+        // };
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Please Click Macroing Window, then push F2 Key");
+            if ui.button("Clear").clicked() {
+                self.text.clear();
+            }
+            ui.add(egui::Separator::default().horizontal());
+           
+            egui::ScrollArea::vertical()
+                .auto_shrink([false; 2])
+                .stick_to_bottom(true)
+                .show(ui, |ui| {
+                    ui.label(&self.text);
+                });
+
+            if ctx.input(|i| i.key_pressed(egui::Key::D) && i.modifiers.ctrl) {
+                self.text.push_str("DEBUG MODE ON");
+                unsafe{
+                    DEBUGMODE = true;
+                }
+            }
+
+            if ctx.input(|i| i.key_pressed(egui::Key::F2)) {
+                self.text.push_str("Clicked\n");
+                let mut pt = POINT { x: 0, y: 0 };
+                unsafe {
+                    GetCursorPos(&mut pt);
+                    let hwnd = WindowFromPoint(pt);
+                    
+                    if GetWindowRect(hwnd, &mut self.rect) != 0 {
+                        self.text.push_str("Selected Winodw Coord: ({self.rect.left}, {self.rect.top})");
+                    } else {
+                        self.text.push_str("Failed Window Coord. Set Coord Default");
+                        self.rect.left = 468; 
+                        self.rect.top = 66;
+                    }
+                }
+                
+                self.stop_sign = false;
+                self.text.push_str("정지하려면 F4를 누르세요...");
+            }
+            if ctx.input(|i| i.key_pressed(egui::Key::F4)) {
+                self.text.push_str("STOPED");
+                self.stop_sign = true;
+            }
+
+            if !self.stop_sign {
+                click2seq(&mut self.enigo, &self.rect, &mut self.stop_sign);
+                click2img(&mut self.enigo, &mut self.stop_sign);
+            }
+
+        });
+        egui::SidePanel::right("my_left_panel").show(ctx, |ui| {
+            ui.label("Hello World!");
+         });
+    }
 }

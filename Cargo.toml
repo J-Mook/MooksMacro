@@ -7,14 +7,10 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-eframe = "0.22.0"
-egui = "0.22.0"
-env_logger = "0.10.0"
 walkdir = "2"
 image = "0.23"
 screenshots = "0.8.4"
 enigo = "0.1.3"
-systray = "0.4.0"
 winapi = { version = "0.3", features = ["winuser"] }
 
 [build-dependencies]

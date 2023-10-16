@@ -12,8 +12,17 @@ use screenshots::Screen;
 use std::{thread, time::Duration};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use winapi::um::winuser::{GetCursorPos, WindowFromPoint, GetWindowRect, GetAsyncKeyState, VK_F4, VK_F2, VK_CONTROL};
+// use winapi::um::winuser::{GetCursorPos, WindowFromPoint, GetWindowRect, GetAsyncKeyState, VK_F4, VK_F2, VK_CONTROL, VK_ESCAPE};
+use winapi::um::winuser::*;
 use winapi::shared::windef::{POINT, RECT};
+use std::fs::OpenOptions;
+use std::io::Write;
+
+
+extern crate winapi;
+use winapi::um::winuser::{GetDpiForWindow, GetDC, ReleaseDC};
+use winapi::um::wingdi::LOGPIXELSX;
+use winapi::shared::windef::HWND;
 
 static mut DEBUGMODE : bool = false;
 
@@ -61,22 +70,24 @@ fn main() {
 }
 
 fn mooks_macro() {
-    
     println!("학습 창을 클릭하고 F2를 누르세요...");
     println!("");
     loop{
         unsafe {
-            let ctrl_pressed = GetAsyncKeyState(VK_CONTROL) & 0x8000u16 as i16 != 0;
-            let d_pressed = GetAsyncKeyState(0x44) & 0x8000u16 as i16 != 0;  // 'D' 키의 가상 키 코드는 0x44입니다.
-            if ctrl_pressed && d_pressed {
+            if (GetAsyncKeyState(VK_CONTROL) & 0x8000u16 as i16 != 0) && (GetAsyncKeyState(0x44) & 0x8000u16 as i16 != 0) {
                 println!("DEBUG MODE ON");
                 DEBUGMODE = true;
             }
 
-            let f2_pressed = GetAsyncKeyState(VK_F2) & 0x8000u16 as i16 != 0;
-            if f2_pressed {
+            if GetAsyncKeyState(VK_F2) & 0x8000u16 as i16 != 0 {
                 println!("(학습 창의 위치를 기억합니다. 매크로가 실행되는 동안 학습 창을 움직이지 마세요.)");
                 break;
+            }
+            
+            if (GetAsyncKeyState(VK_CONTROL) & 0x8000u16 as i16 != 0) && (GetAsyncKeyState(0x52) & 0x8000u16 as i16 != 0) {
+                println!("Start Recording");
+                println!("(F10을 누르면 좌표(활성 윈도우 상대좌표)를 기록하고, ESC를 누르면 기록이 종료됩니다.)");
+                record_mode();
             }
         }
         thread::sleep(Duration::from_millis(100));
@@ -119,6 +130,52 @@ fn mooks_macro() {
     }
 }
 
+fn record_mode()
+{
+    loop {
+        unsafe {
+            if GetAsyncKeyState(VK_ESCAPE) & 0x8000u16 as i16 != 0 {
+                println!("Record Stopped");
+                break;
+            }
+            if GetAsyncKeyState(VK_F10) & 0x8000u16 as i16 != 0{
+                let enigo: Enigo = Enigo::new();
+                let (cur_x, cur_y) = enigo.mouse_location();
+                let (win_x, win_y) = get_active_window_coord();
+                let mut file = OpenOptions::new()
+                    .write(true)
+                    .append(true)
+                    .create(true)
+                    .open("sequence.seq")
+                    .expect("Failed to open file");
+            
+                println!("Record at abs({}, {}) rel({}, {})", cur_x, cur_y, cur_x - win_x, cur_y - win_y);
+                write!(file, "\n{}\t{}", cur_x - win_x, cur_y - win_y).expect("Failed to write to file");
+                thread::sleep(Duration::from_millis(500));
+            }
+        }
+    }
+}
+
+fn get_active_window_coord() -> (i32, i32)
+{
+    unsafe{
+        let mut rect = RECT {
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+        };
+        let mut pt = POINT { x: 0, y: 0 };
+        GetCursorPos(&mut pt);
+        let hwnd = WindowFromPoint(pt);
+        if GetWindowRect(hwnd, &mut rect) != 0 {
+            debug_println!("Selected Winodw Coord: ({}, {})", rect.left, rect.top);
+        }
+        return (rect.left, rect.top);
+    }
+}
+
 fn milli_wait_stop(timeout :u64) -> bool{
 
     let mut cnt = 0;
@@ -145,12 +202,14 @@ fn click2seq(enigo: &mut Enigo, rect: &RECT, stop_sign: &mut bool){
         let reader = BufReader::new(file);
         for line in reader.lines() {
             if let Ok(line) = line {
-                let coords: Vec<&str> = line.trim().split('\t').collect();
-                if coords.len() == 2 {
-                    if let (Ok(x), Ok(y)) = (coords[0].parse::<i32>(), coords[1].parse::<i32>()) {
-                        debug_println!("Sequence Coord ({}, {})", x, y);
-                        enigo.mouse_move_to(rect.left + x, rect.top + y);
-                        enigo.mouse_click(enigo::MouseButton::Left);
+                if line != "\n"{
+                    let coords: Vec<&str> = line.trim().split('\t').collect();
+                    if coords.len() == 2 {
+                        if let (Ok(x), Ok(y)) = (coords[0].parse::<i32>(), coords[1].parse::<i32>()) {
+                            debug_println!("Sequence Coord ({}, {})", x, y);
+                            enigo.mouse_move_to(rect.left + x, rect.top + y);
+                            enigo.mouse_click(enigo::MouseButton::Left);
+                        }
                     }
                 }
             }
